@@ -6,6 +6,7 @@
 //size: 0 is 256x256, 1 is 512x256
 //priority: 0-3, 0 is higher
 //palette: 0 (16) or 1(256)
+
 struct BgConfig new_menu_bg_config[4] = {
     {.padding=0, .b_padding=0, .priority=0, .palette=0, .size=0, .map_base=6 , .character_base=0, .bgid=0, }, 
     {.padding=0, .b_padding=0, .priority=1, .palette=0, .size=0, .map_base=14, .character_base=1, .bgid=1, }, 
@@ -39,6 +40,83 @@ const u8* bg0_get_bg_tiles(){
 const u8* bg0_get_bg_pal(){
     return __bg0Pal;
 }
+void on_up(){
+    if(evs_menu_state->curr_stat_pos != 0){
+        evs_menu_state->curr_stat_pos--;
+    }else{
+        evs_menu_state->curr_stat_pos=5;
+    }
+    audio_play(SOUND_GENERIC_CLINK);
+}
+void on_down(){
+    if(evs_menu_state->curr_stat_pos != 5){
+        evs_menu_state->curr_stat_pos++;
+    }else{
+        evs_menu_state->curr_stat_pos=0;
+    }
+    audio_play(SOUND_GENERIC_CLINK);
+}
+
+void on_left(){
+    objects[evs_menu_state->curr_stat_pos*2  ].pos1.x--;
+    objects[evs_menu_state->curr_stat_pos*2+1].pos1.x--;
+    audio_play(SOUND_GENERIC_CLINK);
+}
+
+void on_right(){
+    objects[evs_menu_state->curr_stat_pos*2  ].pos1.x++;
+    objects[evs_menu_state->curr_stat_pos*2+1].pos1.x++;
+    audio_play(SOUND_GENERIC_CLINK);
+}
+
+void on_load(){
+    //init menu state
+    evs_menu_state->curr_stat_pos=0;
+
+    //Load EVS bar sprites
+    u16 tileTag = 0xD760;
+    u8 y_off = 48;
+    //1st Bar
+    display_sprite(32, 16, 78 , y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
+    tileTag++;
+    display_sprite(32, 16, 110, y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
+    tileTag++;
+    y_off+=14;
+
+    //2nd Bar
+    display_sprite(32, 16, 78 , y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
+    tileTag++;
+    display_sprite(32, 16, 110, y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
+    tileTag++;
+    y_off+=14;
+
+    //3rd Bar
+    display_sprite(32, 16, 78 , y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
+    tileTag++;
+    display_sprite(32, 16, 110, y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
+    tileTag++;
+    y_off+=14;
+    
+    //4th Bar
+    display_sprite(32, 16, 78 , y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
+    tileTag++;
+    display_sprite(32, 16, 110, y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
+    tileTag++;
+    y_off+=14;
+    
+    //5th Bar
+    display_sprite(32, 16, 78 , y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
+    tileTag++;
+    display_sprite(32, 16, 110, y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
+    tileTag++;
+    y_off+=14;
+    
+    //6th Bar
+    display_sprite(32, 16, 78 , y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
+    tileTag++;
+    display_sprite(32, 16, 110, y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
+    
+}
 
 
 const struct InterfaceDefinition NEW_MENU_DEFINITION = {
@@ -57,17 +135,17 @@ const struct InterfaceDefinition NEW_MENU_DEFINITION = {
     .get_bg_3_tilesets   =new_menu_get_bg_tiles,
     .get_bg_3_pal        =new_menu_get_bg_pal, 
     .textboxes     =txtboxes,
-    .on_load=      do_nothing,
+    .on_load       =on_load,
     .on_key_a=     do_nothing,
     .on_key_b=     exit,
     .on_key_start= do_nothing,
     .on_key_select=do_nothing,
     .on_key_l=     do_nothing,
     .on_key_r=     do_nothing,
-    .on_key_up=    do_nothing,
-    .on_key_down=  do_nothing,
-    .on_key_left=  do_nothing,
-    .on_key_right= do_nothing,
+    .on_key_up=    on_up,
+    .on_key_down=  on_down,
+    .on_key_left=  on_left,
+    .on_key_right= on_right,
 };
 
 const u16* new_menu_get_bg_map(){
@@ -79,6 +157,7 @@ const u8* new_menu_get_bg_tiles(){
 const u8* new_menu_get_bg_pal(){
     return __new_menu_guiPal;
 }
+
 
 void do_nothing(){
     return;

@@ -1,6 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#define EVS_MENU_STATE_START 0x0202402C //By default this is the opponent's party
 #include "include/new_menu/new_menu.h"
 
 #define OAM_TABLE_START 0x83A3BB0 		//Default BPRE

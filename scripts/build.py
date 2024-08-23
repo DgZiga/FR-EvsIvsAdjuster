@@ -20,7 +20,7 @@ ASFLAGS = ['-mthumb']
 LDFLAGS = ['-z','muldefs','-T', 'linker.ld', '-T', 'BPRE.ld', '-r']
 CFLAGS= ['-Isrc/include', '-mthumb', '-mno-thumb-interwork', '-mcpu=arm7tdmi',
          '-fno-inline', '-mlong-calls', '-march=armv4t', '-fno-builtin', '-Wall', '-O2']
-GRITFLAGS=['-gB4',      #4bpp
+TILED_GRITFLAGS=['-gB4',      #4bpp
            '-gzl',      #tileset is lz77 compressed
            '-pzl',      #pal is lz77 compressed
            '-pn16',     #pal is 16 colours
@@ -29,6 +29,13 @@ GRITFLAGS=['-gB4',      #4bpp
            '-mzl',      #map is lz77 compressed
            '-mR4',      #
            '-aw256',    #area width is 256
+           '-gTFF0000', #rgb(255,0,0) (#0xFF0000) is trasparency
+           '-ftc']      #file_type: c
+SPRITE_GRITFLAGS=['-gB4',      #4bpp
+           '-pn16',     #pal is 16 colours
+           '-gu8',      #graphics is u8 array
+           '-pu8',      #pal is u8 array
+           '-m!',       #exclude map from output
            '-gTFF0000', #rgb(255,0,0) (#0xFF0000) is trasparency
            '-ftc']      #file_type: c
  
@@ -71,9 +78,15 @@ def process_img(in_file):
         os.makedirs(os.path.dirname(out_file))
     except FileExistsError:
         pass
+    cmd = []
 
-    print('Running Grit on '+os.path.abspath(out_file)+' with target bg: '+bgid)
-    cmd = ['grit', in_file, '-o', out_file, '-mp'+bgid] + GRITFLAGS
+    if bgid == 's':
+        print('Running Sprite Grit on '+os.path.abspath(out_file))
+        cmd = ['grit', in_file, '-o', out_file] + SPRITE_GRITFLAGS
+    else:
+        print('Running Bg Grit on '+os.path.abspath(out_file)+' with target bg: '+bgid)
+        cmd = ['grit', in_file, '-o', out_file, '-mp'+bgid] + TILED_GRITFLAGS
+    
     run_command(cmd)
     return out_file
  

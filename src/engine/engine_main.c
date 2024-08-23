@@ -48,8 +48,6 @@ void gui_handler(){
 			break;
 		case 1: { //Load backgground image, init rboxes and quest list
 			//Load bg image
-			//void *gbackbuffer = malloc(0x800);
-			//(*DNavState)->backbuffer = dexnav_gbackbuffer;
 			gpu_pal_apply((void *)(&def.gui_text_pal), 15 * 16, 32);
             for(u8 i=0; i<4; i++){
                 gpu_pal_apply_compressed((void *)(get_bg_pal(&def, i)()), i*16, 32);
@@ -63,7 +61,7 @@ void gui_handler(){
                 //uncompress tilesets
                 lz77UnCompVram((void *)(get_bg_tilesets(&def, i)()), (void *)(0x06000000 + (0x4000 * def.gui_bg_config[i].character_base)));
             }
-            //free(gbackbuffer);
+            
 			bgid_mark_for_sync(0);
 			bgid_mark_for_sync(1);
 			bgid_mark_for_sync(2);
