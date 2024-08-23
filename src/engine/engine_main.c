@@ -3,7 +3,9 @@
 
 #include "engine_main.h"
 
+
 int new_gui_main(const struct InterfaceDefinition* def) {
+    dprintf("interface_def_addr 0x%x\n, def 0x%x, \n", interface_def_addr, def);
     *interface_def_addr = def;
     fade_screen(0xFFFFFFFF, 0, 0, 16, 0x0000);
     void gui_handler(void);
@@ -16,6 +18,7 @@ int new_gui_main(const struct InterfaceDefinition* def) {
 void gui_handler(){
 	struct FadeControl pal_fade_control = *((struct FadeControl *)0x02037ab8);
     struct InterfaceDefinition def = **interface_def_addr;
+    //dprintf("def 0x%x\n, def.gui_bg_config 0x%x, \n", def, def.gui_bg_config);
 
 	switch(super.multi_purpose_state_tracker){
 		case 0:
@@ -46,16 +49,27 @@ void gui_handler(){
 			break;
 		case 1: { //Load backgground image, init rboxes and quest list
 			//Load bg image
-			void *quest_gbackbuffer = malloc(0x800);
+			void *gbackbuffer = malloc(0x800);
 			//(*DNavState)->backbuffer = dexnav_gbackbuffer;
 			gpu_pal_apply((void *)(&def.gui_text_pal), 15 * 16, 32);
-			gpu_pal_apply_compressed((void *)(def.get_bg_pal()), 0, 32);
-			gpu_pal_apply_compressed((void *)(def.get_bg_pal()), 32, 32);
-			LZ77UnCompWram((void *)(def.get_bg_map()), (void *)quest_gbackbuffer);
-			lz77UnCompVram((void *)(def.get_bg_tilesets()), (void *)0x06000000);
-			bgid_set_tilemap(1, quest_gbackbuffer);
-			bgid_mark_for_sync(1);
+            for(u8 i=0; i<4; i++){
+                gpu_pal_apply_compressed((void *)(get_bg_tilesets(&def, i)), i*16, 32);
+            }
+
+            for(u8 i=0; i<4; i++){
+                memset(gbackbuffer, 0, 0x800);
+                //uncompress map
+                LZ77UnCompWram((void *)(get_bg_map(&def, i)), (void *)gbackbuffer);
+                bgid_set_tilemap(i, gbackbuffer);
+                //uncompress tilesets
+                if(i==2){
+                    dprintf("loading tileset 0x%x into addr 0x%x, \n", get_bg_tilesets(&def, i)(), (0x06000000 + 0x4000 * def.gui_bg_config[i].character_base));
+                }
+                lz77UnCompVram((void *)(get_bg_tilesets(&def, i)()), (void *)(0x06000000 + (0x4000 * def.gui_bg_config[i].character_base)));
+            }
+            free(gbackbuffer);
 			bgid_mark_for_sync(0);
+			bgid_mark_for_sync(1);
 			bgid_mark_for_sync(2);
 			bgid_mark_for_sync(3);
 			//init rboxes

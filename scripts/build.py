@@ -29,6 +29,7 @@ GRITFLAGS=['-gB4',      #4bpp
            '-mzl',      #map is lz77 compressed
            '-mR4',      #
            '-aw256',    #area width is 256
+           '-gTFF0000', #rgb(255,0,0) (#0xFF0000) is trasparency
            '-ftc']      #file_type: c
  
 def run_command(cmd):

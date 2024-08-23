@@ -44,6 +44,9 @@ goto_r0:
 menu_text:
 .string 0x00,"Menu option\nDue",0xFF
 
+stats_names:
+.string " Hp\nAtk\nDef\nSp. Atk\nSp. Def\nSpeed",0xFF
+
 .pool
 
 .org 0x83DEF2C
