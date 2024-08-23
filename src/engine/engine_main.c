@@ -19,7 +19,6 @@ void gui_handler(){
 	struct FadeControl pal_fade_control = *((struct FadeControl *)0x02037ab8);
     struct InterfaceDefinition def = **interface_def_addr;
     //dprintf("def 0x%x\n, def.gui_bg_config 0x%x, \n", def, def.gui_bg_config);
-
 	switch(super.multi_purpose_state_tracker){
 		case 0:
             if (!pal_fade_control.active) {
@@ -29,7 +28,7 @@ void gui_handler(){
 				bgid_mod_y_offset(0, 0, 0);
 				bgid_mod_x_offset(1, 0, 0);
 				bgid_mod_y_offset(1, 0, 0);
-				gpu_tile_bg_drop_all_sets(0);
+				//gpu_tile_bg_drop_all_sets(0);
 				bg_vram_setup(0, def.gui_bg_config, 4);
 				//Clear VRAM
 				u32 set = 0;
@@ -49,35 +48,32 @@ void gui_handler(){
 			break;
 		case 1: { //Load backgground image, init rboxes and quest list
 			//Load bg image
-			void *gbackbuffer = malloc(0x800);
+			//void *gbackbuffer = malloc(0x800);
 			//(*DNavState)->backbuffer = dexnav_gbackbuffer;
 			gpu_pal_apply((void *)(&def.gui_text_pal), 15 * 16, 32);
             for(u8 i=0; i<4; i++){
-                gpu_pal_apply_compressed((void *)(get_bg_tilesets(&def, i)), i*16, 32);
+                gpu_pal_apply_compressed((void *)(get_bg_pal(&def, i)()), i*16, 32);
             }
 
             for(u8 i=0; i<4; i++){
-                memset(gbackbuffer, 0, 0x800);
+			    void *gbackbuffer = malloc(0x1000);
                 //uncompress map
-                LZ77UnCompWram((void *)(get_bg_map(&def, i)), (void *)gbackbuffer);
+                LZ77UnCompWram((void *)(get_bg_map(&def, i)()), (void *)gbackbuffer);
                 bgid_set_tilemap(i, gbackbuffer);
                 //uncompress tilesets
-                if(i==2){
-                    dprintf("loading tileset 0x%x into addr 0x%x, \n", get_bg_tilesets(&def, i)(), (0x06000000 + 0x4000 * def.gui_bg_config[i].character_base));
-                }
                 lz77UnCompVram((void *)(get_bg_tilesets(&def, i)()), (void *)(0x06000000 + (0x4000 * def.gui_bg_config[i].character_base)));
             }
-            free(gbackbuffer);
+            //free(gbackbuffer);
 			bgid_mark_for_sync(0);
 			bgid_mark_for_sync(1);
 			bgid_mark_for_sync(2);
 			bgid_mark_for_sync(3);
 			//init rboxes
 			rbox_init_from_templates(def.textboxes);
-			
-			super.multi_purpose_state_tracker++;
-		}
+
+			super.multi_purpose_state_tracker++; //03003528
 			break;
+		}
 		case 2: //fill rboxes
             if (!pal_fade_control.active) { //Wait for fadescreen to stop
 				// clean boxes
