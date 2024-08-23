@@ -21,22 +21,32 @@ const u8* new_menu_get_bg_tiles();
 
 
 const u16* bg2_get_bg_map(){
-    return bg2Map;
+    return __bg2Map;
 }
 const u8* bg2_get_bg_tiles(){
-    return bg2Tiles;
+    return __bg2Tiles;
 }
 const u8* bg2_get_bg_pal(){
-    return bg2Pal;
+    return __bg2Pal;
+}
+
+const u16* bg0_get_bg_map(){
+    return __bg0Map;
+}
+const u8* bg0_get_bg_tiles(){
+    return __bg0Tiles;
+}
+const u8* bg0_get_bg_pal(){
+    return __bg0Pal;
 }
 
 
 const struct InterfaceDefinition NEW_MENU_DEFINITION = {
     .gui_bg_config =new_menu_bg_config, 
     .gui_text_pal  =text_pal,
-    .get_bg_0_map        =new_menu_get_bg_map, 
-    .get_bg_0_tilesets   =new_menu_get_bg_tiles,
-    .get_bg_0_pal        =new_menu_get_bg_pal, 
+    .get_bg_0_map        =bg0_get_bg_map, 
+    .get_bg_0_tilesets   =bg0_get_bg_tiles,
+    .get_bg_0_pal        =bg0_get_bg_pal, 
     .get_bg_1_map        =new_menu_get_bg_map, 
     .get_bg_1_tilesets   =new_menu_get_bg_tiles,
     .get_bg_1_pal        =new_menu_get_bg_pal, 
@@ -61,13 +71,13 @@ const struct InterfaceDefinition NEW_MENU_DEFINITION = {
 };
 
 const u16* new_menu_get_bg_map(){
-    return new_menu_guiMap;
+    return __new_menu_guiMap;
 }
 const u8* new_menu_get_bg_tiles(){
-    return new_menu_guiTiles;
+    return __new_menu_guiTiles;
 }
 const u8* new_menu_get_bg_pal(){
-    return new_menu_guiPal;
+    return __new_menu_guiPal;
 }
 
 void do_nothing(){

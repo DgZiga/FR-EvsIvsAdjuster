@@ -2,8 +2,9 @@
 #define NEW_MENU_H
 #include <pokeagb/pokeagb.h>
 #include "../interface_definition.h"
-#include "built_graphics/new_menu_gui.h"
-#include "built_graphics/bg2.h"
+#include "built_graphics/0_bg0.h"
+#include "built_graphics/1_new_menu_gui.h"
+#include "built_graphics/2_bg2.h"
 #define rgb5(r, g, b) (u16)((r >> 3) | ((g >> 3) << 5) | ((b >> 3) << 10))
 
 extern const struct InterfaceDefinition NEW_MENU_DEFINITION;

@@ -62,6 +62,8 @@ def process_c(in_file):
  
 def process_img(in_file):
     '''Compile IMGs'''
+    filename = os.path.splitext(os.path.basename(in_file))[0]
+    bgid = filename.split('_')[0]
     # imgs are first converted to .c/.h files, then built like the rest of the source code
     out_file = os.path.join(os.path.dirname(in_file), '..', 'built_graphics', os.path.basename(in_file))
     
@@ -70,8 +72,8 @@ def process_img(in_file):
     except FileExistsError:
         pass
 
-    print('Running Grit on '+os.path.abspath(out_file))
-    cmd = ['grit', in_file, '-o', out_file] + GRITFLAGS
+    print('Running Grit on '+os.path.abspath(out_file)+' with target bg: '+bgid)
+    cmd = ['grit', in_file, '-o', out_file, '-mp'+bgid] + GRITFLAGS
     run_command(cmd)
     return out_file
  
