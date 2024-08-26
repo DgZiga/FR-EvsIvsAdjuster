@@ -1,12 +1,12 @@
 #ifndef NEW_MENU_C
 #define NEW_MENU_C
 #include "new_menu.h"
+
 //char_base is multiplied by 0x4000 and added to 0x06000000. 
 //map_base is multiplied by 0x800 and added to 0x06000000.
 //size: 0 is 256x256, 1 is 512x256
 //priority: 0-3, 0 is higher
 //palette: 0 (16) or 1(256)
-
 struct BgConfig new_menu_bg_config[4] = {
     {.padding=0, .b_padding=0, .priority=0, .palette=0, .size=0, .map_base=6 , .character_base=0, .bgid=0, }, 
     {.padding=0, .b_padding=0, .priority=1, .palette=0, .size=0, .map_base=14, .character_base=1, .bgid=1, }, 
@@ -19,18 +19,6 @@ void exit();
 const u8* new_menu_get_bg_pal();
 const u16* new_menu_get_bg_map();
 const u8* new_menu_get_bg_tiles();
-
-POKEAGB_EXTERN u32 decrypt_player_money(u32 in); //defined in BPRE.ld
-POKEAGB_EXTERN void encrypt_player_money(u32 in, u32 money); //defined in BPRE.ld
-
-u32 get_player_money(){ //stolen from 0813F6D0
-    return decrypt_player_money((*(u32 *)0x03005008)+0x290);
-}
-
-void set_player_money(u32 val){ //stolen from 0809FDD8
-    return encrypt_player_money((*(u32 *)0x03005008)+0x290, val);
-}
-
 
 const u16* bg2_get_bg_map(){
     return __bg2Map;
@@ -68,49 +56,6 @@ void on_down(){
     audio_play(SOUND_GENERIC_CLINK);
 }
 
-void calc_price(){
-    //300 euro ogni 4 EV
-    s32 delta = 0;
-    for(u8 i=0; i<6; i++){
-        if(evs_menu_state->curr_evs[i] > evs_menu_state->start_evs[i]){
-            delta += evs_menu_state->curr_evs[i] - evs_menu_state->start_evs[i];
-        } else {
-            delta -= evs_menu_state->start_evs[i] - evs_menu_state->curr_evs[i] ;
-        }
-    }
-    bool isNeg = false;
-    if(delta < 0){
-        isNeg = true;
-        delta = delta * -1;
-    }
-    u32 price = (delta >> 2) * 300;
-    evs_menu_state->curr_price = price;
-    evs_menu_state->curr_price_is_neg = isNeg;
-
-    fmt_int_10(evs_menu_state->str_buff, price, 0, sizeof(evs_menu_state->str_buff));
-    if(isNeg){
-        for(s8 i=sizeof(evs_menu_state->str_buff); i>=0; i--){
-            if(i!=0){
-                evs_menu_state->str_buff[i]=evs_menu_state->str_buff[i-1];
-            }else{
-                evs_menu_state->str_buff[0] = 0xAE;
-            }
-        }
-    }
-    for(u8 i=0; i<sizeof(evs_menu_state->str_buff); i++){
-        if(evs_menu_state->str_buff[i]==0xFF){
-            evs_menu_state->str_buff[i]=0xB7; //pokesign
-            evs_menu_state->str_buff[i+1]=0xFF;
-            break;
-        }
-    }
-    dprintf("price is: %x", evs_menu_state->str_buff);
-    rboxid_clean (2, true);
-    rboxid_print (2, 3, 1, 1, 0, 0, evs_menu_state->str_buff);
-    rboxid_update(2, 3);
-    rboxid_tilemap_update(2);
-
-}
 
 void on_left(){
     u32 curr_set_ev = evs_menu_state->curr_evs[evs_menu_state->curr_stat_pos];
@@ -180,29 +125,19 @@ extern pchar price_tag[]; //defined in main.s
 extern pchar default_price[]; //defined in main.s
 void on_load(){
     //init menu state
-    evs_menu_state->curr_stat_pos=0;
-    evs_menu_state->curr_selected_pkmn=0;
+    init_evs_menu_state();
 
     //Show rboxes
-    //stat names
-    //rboxid_clean (0, true);
-    //rboxid_print (0, 3, 1, 1, 0, 0, stat_names);
-    //rboxid_update(0, 3);
-    //rboxid_tilemap_update(0);
-
-    //Current money
-    //dprintf("money_maybe: %x, [money_maybe]: %x, \n",saveblock1->money_maybe,*((u32 *)saveblock1->money_maybe));
-    //saveblock2->bag_item_quantity_xor_value;
-
     u32 player_money = get_player_money();
-    fmt_int_10(evs_menu_state->str_buff, player_money, 0, sizeof(evs_menu_state->str_buff));
+    fmt_money(player_money, false);
     rboxid_clean (1, true);
     rboxid_print (1, 3, 1, 1, 0, 0, evs_menu_state->str_buff);
     rboxid_update(1, 3);
     rboxid_tilemap_update(1);
     //Current price
+    fmt_money(evs_menu_state->curr_price, false);
     rboxid_clean (2, true);
-    rboxid_print (2, 3, 1, 1, 0, 0, default_price);
+    rboxid_print (2, 3, 1, 1, 0, 0, evs_menu_state->str_buff);
     rboxid_update(2, 3);
     rboxid_tilemap_update(2);
     //pkmn name pkmn_name_buffer

@@ -20,4 +20,6 @@ struct EvsMenuState{
 
 struct EvsMenuState *evs_menu_state = (struct EvsMenuState *)EVS_MENU_STATE_START;
 
+void init_evs_menu_state();
+
 #endif
