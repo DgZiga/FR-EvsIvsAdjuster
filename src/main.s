@@ -10,7 +10,7 @@ LDR r0, =switch_menu|1
 BX r0
 .pool
 
-.org 0x08810000
+.org freespace
 .importobj "./build/linked.o"
 
 ;super   equ 0x030030F0
@@ -44,8 +44,32 @@ goto_r0:
 menu_text:
 .string 0x00,"Menu option\nDue",0xFF
 
-stats_names:
+stat_names:
 .string " Hp\nAtk\nDef\nSp. Atk\nSp. Def\nSpeed",0xFF
+default_price:
+.string " 0",0xB7,0xFF
+
+.thumb
+.align 2
+check_money: ; stolen from script 0x92 check_money, at 0x0806C1A2
+    push    {r1-R4, LR}
+    ldr     R4, =0x020370D0 ; var_800D
+    ldr     R0, =0x03005008 ; saveblock1_mapdata
+    ldr     R0, [R0]
+    ldr     R1, =0x290
+    add     R0, R0, R1
+    mov     R1, R2
+    ldr     R3, =0x0809FD88|1
+    bl      goto_r3
+    lsl     R0, R0, #0x18
+    lsr     R0, R0, #0x18
+    strh    R0, [R4]
+    mov     R0, #0
+    pop     {r1-r4, r0}
+    bx      R0
+
+goto_r3:
+	bx r3
 
 .pool
 

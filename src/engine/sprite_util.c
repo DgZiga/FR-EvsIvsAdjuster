@@ -28,7 +28,6 @@ u8 display_sprite(u8 sprite_w, u8 sprite_h, u8 sprite_x, u8 sprite_y,
 		.affine_param = 0,
 	};
 	
-    dprintf("diocan is: %x\n", shsi.size);
 	struct SpriteTiles tiles = {ptr_to_tile, sprite_w * sprite_h, tiles_tag};
 	struct SpritePalette pals = {ptr_to_pal, pals_tag};
 	struct Template icon_template = {

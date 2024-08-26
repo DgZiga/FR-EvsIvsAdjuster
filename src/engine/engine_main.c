@@ -3,6 +3,9 @@
 
 #include "engine_main.h"
 
+void main_entrypoint(){
+    new_gui_main(&NEW_MENU_DEFINITION);
+}
 
 int new_gui_main(const struct InterfaceDefinition* def) {
     dprintf("interface_def_addr 0x%x\n, def 0x%x, \n", interface_def_addr, def);

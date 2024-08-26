@@ -412,6 +412,8 @@ stdpal_get = 0x08150408|1;
  * include/pokeagb/graphics/sprites.h
  */
 
+decrypt_player_money = 0x0809FD58|1;
+encrypt_player_money = 0x0809FD70|1;
 affine_reset_all = 0x08007390|1;
 anim_image_empty = 0x08231cf0;
 get_pingpong = 0x08044e30|1;
