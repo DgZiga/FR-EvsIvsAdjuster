@@ -3,6 +3,7 @@
 
 #include <pokeagb/pokeagb.h>
 #include "evs_menu_state.h"
+#include "new_menu.h"
 
 void calc_price();
 void set_player_money(u32 val);

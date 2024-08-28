@@ -13,7 +13,12 @@ struct BgConfig new_menu_bg_config[4] = {
     {.padding=0, .b_padding=0, .priority=2, .palette=0, .size=0, .map_base=22, .character_base=2, .bgid=2, }, 
     {.padding=0, .b_padding=0, .priority=3, .palette=0, .size=0, .map_base=30, .character_base=3, .bgid=3, } };
 struct TextboxTemplate txtboxes[];
-const u16 text_pal[];
+const u16 text_pal[] = {
+	rgb5(255, 0, 255), rgb5(248, 248, 248), rgb5(120, 120, 120),
+	rgb5(0, 0, 0), rgb5(208, 208, 208), rgb5(76, 154, 38),
+	rgb5(102, 194, 66), rgb5(168, 75, 76), rgb5(224, 114, 75),
+	rgb5(180, 124, 41), rgb5(241, 188, 60), rgb5(255, 0, 255),
+    rgb5(255, 0, 255), rgb5(255, 0, 255), rgb5(255, 133, 200), rgb5(64, 200, 248)};
 void do_nothing();
 void exit();
 const u8* new_menu_get_bg_pal();
@@ -131,18 +136,18 @@ void on_load(){
     u32 player_money = get_player_money();
     fmt_money(player_money, false);
     rboxid_clean (1, true);
-    rboxid_print (1, 3, 1, 1, 0, 0, evs_menu_state->str_buff);
+    rboxid_print (1, 3, 1, 1, &text_color, 0, evs_menu_state->str_buff);
     rboxid_update(1, 3);
     rboxid_tilemap_update(1);
     //Current price
     fmt_money(evs_menu_state->curr_price, false);
     rboxid_clean (2, true);
-    rboxid_print (2, 3, 1, 1, 0, 0, evs_menu_state->str_buff);
+    rboxid_print (2, 3, 1, 1, &text_color, 0, evs_menu_state->str_buff);
     rboxid_update(2, 3);
     rboxid_tilemap_update(2);
     //pkmn name pkmn_name_buffer
     rboxid_clean (3, true);
-    rboxid_print (3, 3, 1, 1, 0, 0, party_player[evs_menu_state->curr_selected_pkmn].base.nick);
+    rboxid_print (3, 3, 1, 1, &text_color, 0, party_player[evs_menu_state->curr_selected_pkmn].base.nick);
     rboxid_update(3, 3);
     rboxid_tilemap_update(3);
     
@@ -319,11 +324,5 @@ struct TextboxTemplate txtboxes[] = {
 
 };
 
-const u16 text_pal[] = {
-	rgb5(255, 0, 255), rgb5(248, 248, 248), rgb5(112, 112, 112),
-	rgb5(0, 0, 0), rgb5(208, 208, 208), rgb5(76, 154, 38),
-	rgb5(102, 194, 66), rgb5(168, 75, 76), rgb5(224, 114, 75),
-	rgb5(180, 124, 41), rgb5(241, 188, 60), rgb5(255, 0, 255),
-    rgb5(255, 0, 255), rgb5(255, 0, 255), rgb5(255, 133, 200), rgb5(64, 200, 248)};
 
 #endif

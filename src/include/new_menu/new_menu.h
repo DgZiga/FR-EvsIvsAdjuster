@@ -13,6 +13,9 @@ extern const struct InterfaceDefinition NEW_MENU_DEFINITION;
 #include "../../engine/sprite_util.h"
 #include "../../config.h"
 #include "evs_menu_state.h"
+
+struct TextColor text_color = {.background=0, .foreground=2, .shadow=3};
+
 #include "money.h"
 
 #define CURSOR_TILES_TAG 0x6F
