@@ -13,6 +13,9 @@ struct EvsMenuState{
 
     pchar str_buff[10];
 
+    pchar player_money_str_buff[10];
+    pchar concat_str_buff[21];
+
     u32 curr_price;
     bool curr_price_is_neg;
 
