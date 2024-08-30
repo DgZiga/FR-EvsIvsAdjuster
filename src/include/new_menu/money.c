@@ -37,7 +37,6 @@ void fmt_money(u32 price, bool isNeg){
 
 
 void calc_price(){
-    //300 euro ogni 4 EV
     s32 delta = 0;
     for(u8 i=0; i<6; i++){
         if(evs_menu_state->curr_evs[i] > evs_menu_state->start_evs[i]){
@@ -51,7 +50,7 @@ void calc_price(){
         isNeg = true;
         delta = delta * -1;
     }
-    u32 price = (delta >> 2) * 300;
+    u32 price = (delta >> 2) * PRICE_PER_4_EV;
     evs_menu_state->curr_price = price;
     evs_menu_state->curr_price_is_neg = isNeg;
     fmt_money(price, isNeg);

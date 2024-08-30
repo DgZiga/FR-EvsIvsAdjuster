@@ -5,6 +5,8 @@
 #include "evs_menu_state.h"
 #include "new_menu.h"
 
+#define PRICE_PER_4_EV 300
+
 void calc_price();
 void set_player_money(u32 val);
 u32 get_player_money();
