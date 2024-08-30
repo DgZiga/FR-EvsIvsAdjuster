@@ -21,7 +21,6 @@ int new_gui_main(const struct InterfaceDefinition* def) {
 void gui_handler(){
 	struct FadeControl pal_fade_control = *((struct FadeControl *)0x02037ab8);
     struct InterfaceDefinition def = **interface_def_addr;
-    //dprintf("def 0x%x\n, def.gui_bg_config 0x%x, \n", def, def.gui_bg_config);
 	switch(super.multi_purpose_state_tracker){
 		case 0:
             if (!pal_fade_control.active) {
@@ -98,7 +97,7 @@ void gui_handler(){
 			break;
 		case 5: //Input control NOTE: L and R ARE INVERTED IN POKEAGB
 			if (!pal_fade_control.active) { //Wait for fadescreen to end
-                switch (super.buttons_new_remapped) {
+                switch (super.buttons_new_and_repeated) { 
 					case KEY_SELECT:
 						def.on_key_select();
 						break;
