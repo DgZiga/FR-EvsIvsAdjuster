@@ -77,7 +77,7 @@ void on_left(){
 
 void on_right(){
     u32 curr_set_ev = evs_menu_state->curr_evs[evs_menu_state->curr_stat_pos];
-    if(curr_set_ev >= 252){
+    if(curr_set_ev > 252){
         audio_play(SOUND_CANT_OPEN_HELP_MENU);
         return;
     }
@@ -114,8 +114,8 @@ void on_a(){
 }
 
 
-#define BASE_1_X 14
-#define BASE_2_X 46
+#define BASE_1_X 111
+#define BASE_2_X BASE_1_X + 32 
 
 void on_l(){
     evs_menu_state->curr_evs[evs_menu_state->curr_stat_pos] = 0;
@@ -311,8 +311,8 @@ struct TextboxTemplate txtboxes[] = {
     {
         //pkmn name 
         .bg_id = 0,
-        .x = 19,
-        .y = 6,
+        .x = 2,
+        .y = 5,
         .width = 9,
         .height = 2,
         .pal_id = 15,
