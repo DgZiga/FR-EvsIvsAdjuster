@@ -195,6 +195,12 @@ void on_load(){
     evs_menu_state->start_evs[5]=speed_ev;
     evs_menu_state->curr_evs [5]=speed_ev;
 
+    //Load pokemon sprite
+    u32 species = pokemon_getattr(&party_player[evs_menu_state->curr_selected_pkmn], REQUEST_SPECIES, 0);
+    struct SpriteTiles pkmn_sprite_tiles = pokemon_graphics_front[species];
+    struct SpritePalette pkmn_sprite_pal = pokemon_palette_normal[species];
+    display_compressed_sprite_compressed_pal(64, 64, 45, 90, pkmn_sprite_tiles.tag, (void *)pkmn_sprite_tiles.data, pkmn_sprite_pal.tag, (void *)pkmn_sprite_pal.data, 0, 0);	
+
     //Load cursor sprite
     u8 cursor_oam_id = display_compressed_sprite(16, 16, cursor_positions[0][0], cursor_positions[0][1], CURSOR_TILES_TAG, (void *)CURSOR_TILE_ADDR, CURSOR_PALS_TAG, (void *)0x08463308, 1, 0);	
     evs_menu_state->cursor_oam_id = cursor_oam_id;
