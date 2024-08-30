@@ -36,7 +36,7 @@ void fmt_money(u32 price, bool isNeg){
 }
 
 
-void calc_price(){
+void calc_price(bool gfx_upd){
     s32 delta = 0;
     for(u8 i=0; i<6; i++){
         if(evs_menu_state->curr_evs[i] > evs_menu_state->start_evs[i]){
@@ -53,11 +53,13 @@ void calc_price(){
     u32 price = (delta >> 2) * PRICE_PER_4_EV;
     evs_menu_state->curr_price = price;
     evs_menu_state->curr_price_is_neg = isNeg;
-    fmt_money(price, isNeg);
-    rboxid_clean (2, true);
-    rboxid_print (2, 3, 1, 1, &text_color, 0, evs_menu_state->str_buff);
-    rboxid_update(2, 3);
-    rboxid_tilemap_update(2);
+    if(gfx_upd){
+        fmt_money(price, isNeg);
+        rboxid_clean (2, true);
+        rboxid_print (2, 3, 1, 1, &text_color, 0, evs_menu_state->str_buff);
+        rboxid_update(2, 3);
+        rboxid_tilemap_update(2);
+    }
 
 }
 

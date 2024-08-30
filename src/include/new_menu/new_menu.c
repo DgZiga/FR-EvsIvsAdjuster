@@ -88,7 +88,7 @@ void on_left(){
     objects[evs_menu_state->evs_bars_oam_ids[evs_menu_state->curr_stat_pos][0]].pos1.x--;
     objects[evs_menu_state->evs_bars_oam_ids[evs_menu_state->curr_stat_pos][1]].pos1.x--;
     audio_play(SOUND_GENERIC_CLINK);
-    calc_price();
+    calc_price(true);
 }
 
 void on_right(){
@@ -104,7 +104,7 @@ void on_right(){
     objects[evs_menu_state->evs_bars_oam_ids[evs_menu_state->curr_stat_pos][0]].pos1.x++;
     objects[evs_menu_state->evs_bars_oam_ids[evs_menu_state->curr_stat_pos][1]].pos1.x++;
     audio_play(SOUND_GENERIC_CLINK);
-    calc_price();
+    calc_price(true);
 }
 
 void on_a(){
@@ -138,10 +138,27 @@ void on_a(){
 
 void on_l(){
     evs_menu_state->curr_evs[evs_menu_state->curr_stat_pos] = 0;
-    objects[evs_menu_state->curr_stat_pos*2  ].pos1.x = BASE_1_X;
-    objects[evs_menu_state->curr_stat_pos*2+1].pos1.x = BASE_2_X;
+    objects[evs_menu_state->evs_bars_oam_ids[evs_menu_state->curr_stat_pos][0]].pos1.x = BASE_1_X;
+    objects[evs_menu_state->evs_bars_oam_ids[evs_menu_state->curr_stat_pos][1]].pos1.x = BASE_2_X;
     audio_play(SOUND_GENERIC_CLINK);
-    calc_price();
+    calc_price(true);
+}
+
+void on_r(){
+    for(u8 i=0; i<63; i++){
+        //if price is negative (the player has credit) money is always enough, otherwise project price and compare to player money
+        bool money_is_enough = evs_menu_state->curr_price_is_neg ? true : get_player_money() >= evs_menu_state->curr_price + PRICE_PER_4_EV; 
+        if(evs_menu_state->curr_evs[evs_menu_state->curr_stat_pos] >= 252 || !money_is_enough){
+            break;
+        }
+        evs_menu_state->curr_evs[evs_menu_state->curr_stat_pos]+=4;
+        objects[evs_menu_state->evs_bars_oam_ids[evs_menu_state->curr_stat_pos][0]].pos1.x++;
+        objects[evs_menu_state->evs_bars_oam_ids[evs_menu_state->curr_stat_pos][1]].pos1.x++;
+        calc_price(false);
+    }
+    
+    audio_play(SOUND_GENERIC_CLINK);
+    calc_price(true);
 }
 
 extern pchar stat_names[]; //defined in main.s
@@ -242,8 +259,8 @@ const struct InterfaceDefinition NEW_MENU_DEFINITION = {
     .on_key_b=     exit,
     .on_key_start= do_nothing,
     .on_key_select=on_a,
-    .on_key_l=     do_nothing,
-    .on_key_r=     do_nothing,
+    .on_key_l=     on_l,
+    .on_key_r=     on_r,
     .on_key_up=    on_up,
     .on_key_down=  on_down,
     .on_key_left=  on_left,

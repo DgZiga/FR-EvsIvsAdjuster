@@ -3,6 +3,11 @@
 .open "./BPRE0.gba","./multi.gba", 0x08000000
 .loadtable "./charmap.txt"
 
+.org 0x813B8C2 ; disable help system buttons, otherwise that would pop up instead on on_key_l and on_key_r
+.byte 0x1D 
+.byte 0xE0
+.pool
+
 .org 0x806F282
 .thumb
 .align 2

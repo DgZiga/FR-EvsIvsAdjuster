@@ -7,7 +7,7 @@
 
 #define PRICE_PER_4_EV 300
 
-void calc_price();
+void calc_price(bool gfx_upd);
 void set_player_money(u32 val);
 u32 get_player_money();
 void fmt_money(u32 price, bool isNeg);
