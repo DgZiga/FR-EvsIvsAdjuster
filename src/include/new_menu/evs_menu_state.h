@@ -17,6 +17,7 @@ struct EvsMenuState{
     bool curr_price_is_neg;
 
     u8 evs_bars_oam_ids[6][2]; //first index is stat, second is first or second bar
+    u8 cursor_oam_id;
 
 };
 

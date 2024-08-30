@@ -44,12 +44,27 @@ const u8* bg0_get_bg_tiles(){
 const u8* bg0_get_bg_pal(){
     return __bg0Pal;
 }
+//first index is stat index, second index is 0=x, 1=y
+s16 cursor_positions[6][2] = {
+    {100,48 },
+    {100,62 },
+    {100,76 },
+    {100,90 },
+    {100,104},
+    {100,118},
+};
+
+void upd_cursor_pos(){
+    objects[evs_menu_state->cursor_oam_id].pos1.x = cursor_positions[evs_menu_state->curr_stat_pos][0];
+    objects[evs_menu_state->cursor_oam_id].pos1.y = cursor_positions[evs_menu_state->curr_stat_pos][1];
+}
 void on_up(){
     if(evs_menu_state->curr_stat_pos != 0){
         evs_menu_state->curr_stat_pos--;
     }else{
         evs_menu_state->curr_stat_pos=5;
     }
+    upd_cursor_pos();
     audio_play(SOUND_GENERIC_CLINK);
 }
 void on_down(){
@@ -58,6 +73,7 @@ void on_down(){
     }else{
         evs_menu_state->curr_stat_pos=0;
     }
+    upd_cursor_pos();
     audio_play(SOUND_GENERIC_CLINK);
 }
 
@@ -180,17 +196,9 @@ void on_load(){
     evs_menu_state->curr_evs [5]=speed_ev;
 
     //Load cursor sprite
-    /*u8 cursor_oam_id = display_compressed_sprite(16, 16, cursor_positions[0][0], cursor_positions[0][1], CURSOR_TILES_TAG, (void *)CURSOR_TILE_ADDR, CURSOR_PALS_TAG, (void *)0x08463308, 1, 0);	
-    quest_gui_info->cursor_oam_id = cursor_oam_id;
-    //Display all the needed NPCs
-    for(u8 i=0;
-            i<GUI_ENTRIES_PER_PAGE && quest_gui_info->page_quests[i]->oam_id != 0xFF;
-            i++){
-            
-        u8 npc_oam_id = display_npc(quest_gui_info->page_quests[i]->oam_id, 52, 24*i + 25, i);
-        quest_gui_info->npc_oam_ids[i] = npc_oam_id;
-    }*/
-
+    u8 cursor_oam_id = display_compressed_sprite(16, 16, cursor_positions[0][0], cursor_positions[0][1], CURSOR_TILES_TAG, (void *)CURSOR_TILE_ADDR, CURSOR_PALS_TAG, (void *)0x08463308, 1, 0);	
+    evs_menu_state->cursor_oam_id = cursor_oam_id;
+    upd_cursor_pos();
 
     //Load EVS bar sprites
     u16 tileTag = 0xD760;
