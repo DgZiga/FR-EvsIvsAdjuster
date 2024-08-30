@@ -58,6 +58,14 @@ void upd_cursor_pos(){
     objects[evs_menu_state->cursor_oam_id].pos1.x = cursor_positions[evs_menu_state->curr_stat_pos][0];
     objects[evs_menu_state->cursor_oam_id].pos1.y = cursor_positions[evs_menu_state->curr_stat_pos][1];
 }
+//Total EVs of a pkmn cant be more than 510. Returns true if more EVs can be added, false otherwise
+bool check_total_ev(){
+    u32 sum = 0;
+    for(u8 i=0; i<6; i++){
+        sum += evs_menu_state->curr_evs[i];
+    }
+    return sum < 508;
+}
 void on_up(){
     if(evs_menu_state->curr_stat_pos != 0){
         evs_menu_state->curr_stat_pos--;
@@ -95,7 +103,7 @@ void on_right(){
     u32 curr_set_ev = evs_menu_state->curr_evs[evs_menu_state->curr_stat_pos];
     //if price is negative (the player has credit) money is always enough, otherwise project price and compare to player money
     bool money_is_enough = evs_menu_state->curr_price_is_neg ? true : get_player_money() >= evs_menu_state->curr_price + PRICE_PER_4_EV; 
-    if(curr_set_ev >= 252 || !money_is_enough){
+    if(curr_set_ev >= 252 || !money_is_enough || !check_total_ev()){
         audio_play(SOUND_CANT_OPEN_HELP_MENU);
         return;
     }
@@ -136,6 +144,7 @@ void on_a(){
 #define BASE_1_X 111
 #define BASE_2_X BASE_1_X + 32 
 
+
 void on_l(){
     evs_menu_state->curr_evs[evs_menu_state->curr_stat_pos] = 0;
     objects[evs_menu_state->evs_bars_oam_ids[evs_menu_state->curr_stat_pos][0]].pos1.x = BASE_1_X;
@@ -148,7 +157,7 @@ void on_r(){
     for(u8 i=0; i<63; i++){
         //if price is negative (the player has credit) money is always enough, otherwise project price and compare to player money
         bool money_is_enough = evs_menu_state->curr_price_is_neg ? true : get_player_money() >= evs_menu_state->curr_price + PRICE_PER_4_EV; 
-        if(evs_menu_state->curr_evs[evs_menu_state->curr_stat_pos] >= 252 || !money_is_enough){
+        if(evs_menu_state->curr_evs[evs_menu_state->curr_stat_pos] >= 252 || !money_is_enough || !check_total_ev()){
             break;
         }
         evs_menu_state->curr_evs[evs_menu_state->curr_stat_pos]+=4;
