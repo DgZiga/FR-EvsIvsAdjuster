@@ -95,7 +95,7 @@ void on_right(){
     u32 curr_set_ev = evs_menu_state->curr_evs[evs_menu_state->curr_stat_pos];
     //if price is negative (the player has credit) money is always enough, otherwise project price and compare to player money
     bool money_is_enough = evs_menu_state->curr_price_is_neg ? true : get_player_money() >= evs_menu_state->curr_price + PRICE_PER_4_EV; 
-    if(curr_set_ev > 252 || !money_is_enough){
+    if(curr_set_ev >= 252 || !money_is_enough){
         audio_play(SOUND_CANT_OPEN_HELP_MENU);
         return;
     }
