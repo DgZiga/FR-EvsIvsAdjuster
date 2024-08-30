@@ -69,8 +69,8 @@ void on_left(){
         return;
     }
     evs_menu_state->curr_evs[evs_menu_state->curr_stat_pos]-=4;
-    objects[evs_menu_state->curr_stat_pos*2  ].pos1.x--;
-    objects[evs_menu_state->curr_stat_pos*2+1].pos1.x--;
+    objects[evs_menu_state->evs_bars_oam_ids[evs_menu_state->curr_stat_pos][0]].pos1.x--;
+    objects[evs_menu_state->evs_bars_oam_ids[evs_menu_state->curr_stat_pos][1]].pos1.x--;
     audio_play(SOUND_GENERIC_CLINK);
     calc_price();
 }
@@ -83,9 +83,10 @@ void on_right(){
         audio_play(SOUND_CANT_OPEN_HELP_MENU);
         return;
     }
+    
     evs_menu_state->curr_evs[evs_menu_state->curr_stat_pos]+=4;
-    objects[evs_menu_state->curr_stat_pos*2  ].pos1.x++;
-    objects[evs_menu_state->curr_stat_pos*2+1].pos1.x++;
+    objects[evs_menu_state->evs_bars_oam_ids[evs_menu_state->curr_stat_pos][0]].pos1.x++;
+    objects[evs_menu_state->evs_bars_oam_ids[evs_menu_state->curr_stat_pos][1]].pos1.x++;
     audio_play(SOUND_GENERIC_CLINK);
     calc_price();
 }
@@ -178,51 +179,31 @@ void on_load(){
     evs_menu_state->start_evs[5]=speed_ev;
     evs_menu_state->curr_evs [5]=speed_ev;
 
+    //Load cursor sprite
+    /*u8 cursor_oam_id = display_compressed_sprite(16, 16, cursor_positions[0][0], cursor_positions[0][1], CURSOR_TILES_TAG, (void *)CURSOR_TILE_ADDR, CURSOR_PALS_TAG, (void *)0x08463308, 1, 0);	
+    quest_gui_info->cursor_oam_id = cursor_oam_id;
+    //Display all the needed NPCs
+    for(u8 i=0;
+            i<GUI_ENTRIES_PER_PAGE && quest_gui_info->page_quests[i]->oam_id != 0xFF;
+            i++){
+            
+        u8 npc_oam_id = display_npc(quest_gui_info->page_quests[i]->oam_id, 52, 24*i + 25, i);
+        quest_gui_info->npc_oam_ids[i] = npc_oam_id;
+    }*/
+
+
     //Load EVS bar sprites
     u16 tileTag = 0xD760;
     u8 y_off = 48;
     const u8 y_delta = 14;
 
-    //1st Bar
-    display_sprite(32, 16, BASE_1_X + (hp_ev>>2) , y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
-    tileTag++;
-    display_sprite(32, 16, BASE_2_X + (hp_ev>>2), y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
-    tileTag++;
-    y_off+=y_delta;
-
-    //2nd Bar
-    display_sprite(32, 16, BASE_1_X + (atk_ev>>2) , y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
-    tileTag++;
-    display_sprite(32, 16, BASE_2_X + (atk_ev>>2), y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
-    tileTag++;
-    y_off+=y_delta;
-
-    //3rd Bar
-    display_sprite(32, 16, BASE_1_X + (def_ev>>2) , y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
-    tileTag++;
-    display_sprite(32, 16, BASE_2_X + (def_ev>>2), y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
-    tileTag++;
-    y_off+=y_delta;
-    
-    //4th Bar
-    display_sprite(32, 16, BASE_1_X + (spatk_ev>>2) , y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
-    tileTag++;
-    display_sprite(32, 16, BASE_2_X + (spatk_ev>>2), y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
-    tileTag++;
-    y_off+=y_delta;
-    
-    //5th Bar
-    display_sprite(32, 16, BASE_1_X + (spdef_ev>>2) , y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
-    tileTag++;
-    display_sprite(32, 16, BASE_2_X + (spdef_ev>>2), y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
-    tileTag++;
-    y_off+=y_delta;
-    
-    //6th Bar
-    display_sprite(32, 16, BASE_1_X + (speed_ev>>2) , y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
-    tileTag++;
-    display_sprite(32, 16, BASE_2_X + (speed_ev>>2), y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
-    
+    for(u8 i=0; i<6; i++){
+        evs_menu_state->evs_bars_oam_ids[i][0]=display_sprite(32, 16, BASE_1_X + (evs_menu_state->start_evs[i]>>2) , y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
+        tileTag++;
+        evs_menu_state->evs_bars_oam_ids[i][1]=display_sprite(32, 16, BASE_2_X + (evs_menu_state->start_evs[i]>>2), y_off, tileTag, (void *)s_greenblockTiles, 0xDAC0, (void *)s_greenblockPal, 0, 0, 3);
+        tileTag++;
+        y_off+=y_delta;
+    }
 }
 
 

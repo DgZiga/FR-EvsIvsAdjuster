@@ -18,6 +18,8 @@ struct TextColor text_color = {.background=0, .foreground=2, .shadow=3};
 
 #include "money.h"
 
+#define CURSOR_TILE_ADDR 0x08463328 	//Default BPRE
+#define CURSOR_PALS_ADDR 0x08463308 	//Default BPRE
 #define CURSOR_TILES_TAG 0x6F
 #define CURSOR_PALS_TAG 0x08
 

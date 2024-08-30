@@ -16,6 +16,8 @@ struct EvsMenuState{
     u32 curr_price;
     bool curr_price_is_neg;
 
+    u8 evs_bars_oam_ids[6][2]; //first index is stat, second is first or second bar
+
 };
 
 struct EvsMenuState *evs_menu_state = (struct EvsMenuState *)EVS_MENU_STATE_START;
