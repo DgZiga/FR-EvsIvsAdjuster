@@ -16,7 +16,9 @@ void c2_gui(){
 void vblank_cb_spq(){
 	gpu_sprites_upload();
 	copy_queue_process();
-	gpu_pal_upload();
+	gpu_pal_upload();    
+    rboxid_update(3, 3);
+    rboxid_tilemap_update(3);
 }
 
 

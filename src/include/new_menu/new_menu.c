@@ -73,16 +73,12 @@ extern pchar instructions[]; //defined in main.s
 void display_instructions(){
     rboxid_clean (3, true);
     rboxid_print (3, 3, 1, 1, &text_color, 0, instructions);
-    rboxid_update(3, 3);
-    rboxid_tilemap_update(3);
 }
 
 extern pchar confirm_str[]; //defined in main.s
 void display_confirm_str(){
     rboxid_clean (3, true);
     rboxid_print (3, 3, 50, 3, &text_color, 0, confirm_str);
-    rboxid_update(3, 3);
-    rboxid_tilemap_update(3);
 }
 //Total EVs of a pkmn cant be more than 510. Returns true if more EVs can be added, false otherwise
 bool check_total_ev(){
