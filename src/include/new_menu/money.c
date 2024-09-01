@@ -55,10 +55,10 @@ void calc_price(bool gfx_upd){
     evs_menu_state->curr_price_is_neg = isNeg;
     if(gfx_upd){
         fmt_money(price, isNeg);
-        rboxid_clean (2, true);
-        rboxid_print (2, 3, 1, 1, &text_color, 0, evs_menu_state->str_buff);
-        rboxid_update(2, 3);
-        rboxid_tilemap_update(2);
+        rboxid_clean (1, true);
+        rboxid_print (1, 3, 1, 1, &text_color, 0, evs_menu_state->str_buff);
+        rboxid_update(1, 3);
+        rboxid_tilemap_update(1);
     }
 
 }

@@ -170,9 +170,7 @@ void on_r(){
     calc_price(true);
 }
 
-extern pchar stat_names[]; //defined in main.s
-extern pchar price_tag[]; //defined in main.s
-extern pchar default_price[]; //defined in main.s
+extern pchar instructions[]; //defined in main.s
 void on_load(){
     //init menu state
     init_evs_menu_state();
@@ -180,21 +178,21 @@ void on_load(){
     //Show rboxes
     u32 player_money = get_player_money();
     fmt_money(player_money, false);
+    rboxid_clean (0, true);
+    rboxid_print (0, 3, 1, 1, &text_color, 0, evs_menu_state->str_buff);
+    rboxid_update(0, 3);
+    rboxid_tilemap_update(0);
+    //Current price
+    fmt_money(evs_menu_state->curr_price, false);
     rboxid_clean (1, true);
     rboxid_print (1, 3, 1, 1, &text_color, 0, evs_menu_state->str_buff);
     rboxid_update(1, 3);
     rboxid_tilemap_update(1);
-    //Current price
-    fmt_money(evs_menu_state->curr_price, false);
+    //pkmn name pkmn_name_buffer
     rboxid_clean (2, true);
-    rboxid_print (2, 3, 1, 1, &text_color, 0, evs_menu_state->str_buff);
+    rboxid_print (2, 3, 1, 1, &text_color, 0, party_player[evs_menu_state->curr_selected_pkmn].base.nick);
     rboxid_update(2, 3);
     rboxid_tilemap_update(2);
-    //pkmn name pkmn_name_buffer
-    rboxid_clean (3, true);
-    rboxid_print (3, 3, 1, 1, &text_color, 0, party_player[evs_menu_state->curr_selected_pkmn].base.nick);
-    rboxid_update(3, 3);
-    rboxid_tilemap_update(3);
     
     u32 hp_ev    = pokemon_getattr(&party_player[evs_menu_state->curr_selected_pkmn], REQUEST_HP_EV   , 0) >> 2 << 2;
     u32 atk_ev   = pokemon_getattr(&party_player[evs_menu_state->curr_selected_pkmn], REQUEST_ATK_EV  , 0) >> 2 << 2;
@@ -300,17 +298,8 @@ void exit(){
 
 //larghezza salta di 8px in 8 px
 // lunghezza sempre di 8px in 8 px ma è come se ci aggiungessi sempre 1 (parte da 8 px)
+//charbase is multiplied byu 0x20 and added to 0x06000000
 struct TextboxTemplate txtboxes[] = {
-    {
-        /*stats names */
-        .bg_id = 0,
-        .x = 2,
-        .y = 5,
-        .width = 25,
-        .height = 11,
-        .pal_id = 15,
-        .charbase = 1,
-    },
     {
         //current money 
         .bg_id = 0,
@@ -319,7 +308,7 @@ struct TextboxTemplate txtboxes[] = {
         .width = 8,
         .height = 2,
         .pal_id = 15,
-        .charbase = 71,
+        .charbase = 1,
     },
     {
         //current price 
