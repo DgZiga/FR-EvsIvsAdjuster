@@ -164,6 +164,12 @@ void on_right(){
     }
 }
 
+void exit_unsaved(){
+    audio_play(SOUND_GENERIC_CLINK);
+    super.multi_purpose_state_tracker=0;
+    set_callback1(gui_exit);
+}
+
 void back_from_confirm(){
     audio_play(SOUND_GENERIC_CLINK);
     evs_menu_state->curr_mode = EVS;
@@ -192,10 +198,9 @@ void on_b(){
     if(evs_menu_state->curr_mode == CONFIRM){
         back_from_confirm();
     } else {
-        exit();
+        exit_unsaved();
     }
 }
-
 
 #define BASE_1_X 111
 #define BASE_2_X BASE_1_X + 32 
@@ -336,7 +341,7 @@ const struct InterfaceDefinition NEW_MENU_DEFINITION = {
     .on_key_a=     on_a,
     .on_key_b=     on_b,
     .on_key_start= do_nothing,
-    .on_key_select=on_a,
+    .on_key_select=do_nothing,
     .on_key_l=     on_l,
     .on_key_r=     on_r,
     .on_key_up=    on_up,
@@ -382,9 +387,7 @@ void exit(){
     pokemon_setattr(&party_player[evs_menu_state->curr_selected_pkmn], REQUEST_SPATK_EV, &evs_menu_state->curr_evs [3]);
     pokemon_setattr(&party_player[evs_menu_state->curr_selected_pkmn], REQUEST_SPDEF_EV, &evs_menu_state->curr_evs [4]);
     pokemon_setattr(&party_player[evs_menu_state->curr_selected_pkmn], REQUEST_SPD_EV  , &evs_menu_state->curr_evs [5]);
-    audio_play(SOUND_GENERIC_CLINK);
-    super.multi_purpose_state_tracker=0;
-    set_callback1(gui_exit);
+    exit_unsaved();
 }
 
 
