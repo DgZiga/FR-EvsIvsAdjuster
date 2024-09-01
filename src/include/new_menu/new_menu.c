@@ -118,7 +118,7 @@ void on_right(){
 void on_a(){
     //calc price. Do not allow the player to leave with negative price.
     u32 player_money = get_player_money();
-    if(!evs_menu_state->curr_price_is_neg || evs_menu_state->curr_price > player_money){
+    if(evs_menu_state->curr_price_is_neg || evs_menu_state->curr_price > player_money){
         audio_play(SOUND_CANT_OPEN_HELP_MENU);
         return;
     }
