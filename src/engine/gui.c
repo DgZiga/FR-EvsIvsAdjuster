@@ -17,8 +17,11 @@ void vblank_cb_spq(){
 	gpu_sprites_upload();
 	copy_queue_process();
 	gpu_pal_upload();    
-    rboxid_update(3, 3);
-    rboxid_tilemap_update(3);
+
+    rboxid_update(0, 3);
+    rboxid_tilemap_update(0);
+    rboxid_update(2, 3);
+    rboxid_tilemap_update(2);
 }
 
 

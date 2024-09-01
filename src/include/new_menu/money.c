@@ -18,7 +18,7 @@ void set_player_money(u32 val){ //stolen from 0809FDD8
 void fmt_money(u32 price, bool isNeg){
     fmt_int_10(evs_menu_state->str_buff, price, 0, sizeof(evs_menu_state->str_buff));
     if(isNeg){
-        for(s8 i=sizeof(evs_menu_state->str_buff); i>=0; i--){
+        for(s8 i=sizeof(evs_menu_state->str_buff)-1; i>=0; i--){
             if(i!=0){
                 evs_menu_state->str_buff[i]=evs_menu_state->str_buff[i-1];
             }else{
@@ -53,12 +53,18 @@ void calc_price(bool gfx_upd){
     u32 price = (delta >> 2) * PRICE_PER_4_EV;
     evs_menu_state->curr_price = price;
     evs_menu_state->curr_price_is_neg = isNeg;
+
     if(gfx_upd){
         fmt_money(price, isNeg);
-        rboxid_clean (1, true);
-        rboxid_print (1, 3, 1, 1, &text_color, 0, evs_menu_state->str_buff);
-        rboxid_update(1, 3);
-        rboxid_tilemap_update(1);
+
+        memcpy(evs_menu_state->concat_str_buff, evs_menu_state->player_money_str_buff, 10);
+        evs_menu_state->concat_str_buff[10] = 0xFE; // \n
+        memcpy(&(evs_menu_state->concat_str_buff[11]), evs_menu_state->str_buff, 10);
+
+        dprintf("money: %x, price: %x, concat: %x \n", evs_menu_state->player_money_str_buff, evs_menu_state->str_buff, evs_menu_state->concat_str_buff);
+
+        rboxid_clean (0, true);
+        rboxid_print (0, 3, 1, 1, &text_color, 0, evs_menu_state->concat_str_buff);
     }
 
 }

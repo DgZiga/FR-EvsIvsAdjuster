@@ -16,6 +16,8 @@ struct EvsMenuState{
     u32 curr_evs [6]; //hp, atk, def, spatk, spdef, speed
 
     pchar str_buff[10];
+    pchar player_money_str_buff[10];
+    pchar concat_str_buff[21];
 
     u32 curr_price;
     bool curr_price_is_neg;

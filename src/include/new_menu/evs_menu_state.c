@@ -9,6 +9,9 @@ void init_evs_menu_state(){
     evs_menu_state->curr_price=0;
     evs_menu_state->curr_price_is_neg=false;
     memset(evs_menu_state->evs_bars_oam_ids,0,sizeof(evs_menu_state->evs_bars_oam_ids));
+    memset(evs_menu_state->player_money_str_buff, 0, sizeof(evs_menu_state->player_money_str_buff));
+    memset(evs_menu_state->str_buff, 0, sizeof(evs_menu_state->str_buff));
+    memset(evs_menu_state->concat_str_buff, 0, sizeof(evs_menu_state->concat_str_buff));
     evs_menu_state->curr_mode = EVS;
 }
 

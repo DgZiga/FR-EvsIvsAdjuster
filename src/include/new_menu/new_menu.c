@@ -46,12 +46,12 @@ const u8* bg0_get_bg_pal(){
 }
 //first index is stat index, second index is 0=x, 1=y
 s16 evs_cursor_positions[6][2] = {
-    {100,48 },
-    {100,62 },
-    {100,76 },
-    {100,90 },
-    {100,104},
-    {100,118},
+    {100,42 },
+    {100,56 },
+    {100,70 },
+    {100,84 },
+    {100,98 },
+    {100,112},
 };
 //first index is stat index, second index is 0=x, 1=y
 s16 confirm_cursor_positions[2][2] = {
@@ -71,14 +71,14 @@ void upd_cursor_pos(){
 
 extern pchar instructions[]; //defined in main.s
 void display_instructions(){
-    rboxid_clean (3, true);
-    rboxid_print (3, 3, 1, 1, &text_color, 0, instructions);
+    rboxid_clean (2, true);
+    rboxid_print (2, 3, 1, 1, &text_color, 0, instructions);
 }
 
 extern pchar confirm_str[]; //defined in main.s
 void display_confirm_str(){
-    rboxid_clean (3, true);
-    rboxid_print (3, 3, 50, 3, &text_color, 0, confirm_str);
+    rboxid_clean (2, true);
+    rboxid_print (2, 3, 50, 3, &text_color, 0, confirm_str);
 }
 //Total EVs of a pkmn cant be more than 510. Returns true if more EVs can be added, false otherwise
 bool check_total_ev(){
@@ -239,21 +239,29 @@ void on_load(){
     //Show rboxes
     u32 player_money = get_player_money();
     fmt_money(player_money, false);
-    rboxid_clean (0, true);
-    rboxid_print (0, 3, 1, 1, &text_color, 0, evs_menu_state->str_buff);
-    rboxid_update(0, 3);
-    rboxid_tilemap_update(0);
-    //Current price
+
+    //remove end-of-string terminator: we will concat player money to newline and then price
+    for(u8 i=0; i<sizeof(evs_menu_state->str_buff); i++){
+        if(evs_menu_state->str_buff[i]==0xFF){
+            evs_menu_state->str_buff[i]=0;
+            break;
+        }
+    }
+    memcpy(evs_menu_state->player_money_str_buff, evs_menu_state->str_buff, sizeof(evs_menu_state->str_buff));
+
+    memcpy(evs_menu_state->concat_str_buff, evs_menu_state->player_money_str_buff, 10);
+    evs_menu_state->concat_str_buff[10] = 0xFE; // \n
     fmt_money(evs_menu_state->curr_price, false);
+    memcpy(&(evs_menu_state->concat_str_buff[11]), evs_menu_state->str_buff, 10);
+
+    rboxid_clean (0, true);
+    rboxid_print (0, 3, 1, 1, &text_color, 0, evs_menu_state->concat_str_buff);
+
+    //pkmn name pkmn_name_buffer
     rboxid_clean (1, true);
-    rboxid_print (1, 3, 1, 1, &text_color, 0, evs_menu_state->str_buff);
+    rboxid_print (1, 3, 1, 1, &text_color, 0, party_player[evs_menu_state->curr_selected_pkmn].base.nick);
     rboxid_update(1, 3);
     rboxid_tilemap_update(1);
-    //pkmn name pkmn_name_buffer
-    rboxid_clean (2, true);
-    rboxid_print (2, 3, 1, 1, &text_color, 0, party_player[evs_menu_state->curr_selected_pkmn].base.nick);
-    rboxid_update(2, 3);
-    rboxid_tilemap_update(2);
     //instructions
     display_instructions();
     
@@ -295,7 +303,7 @@ void on_load(){
 
     //Load EVS bar sprites
     u16 tileTag = 0xD760;
-    u8 y_off = 48;
+    u8 y_off = 42;
     const u8 y_delta = 14;
 
     for(u8 i=0; i<6; i++){
@@ -385,24 +393,14 @@ void exit(){
 //charbase is multiplied byu 0x20 and added to 0x06000000
 struct TextboxTemplate txtboxes[] = {
     {
-        //current money 
+        //current money and price
         .bg_id = 0,
         .x = 21,
         .y = 0,
         .width = 8,
-        .height = 2,
+        .height = 4,
         .pal_id = 15,
         .charbase = 1,
-    },
-    {
-        //current price 
-        .bg_id = 0,
-        .x = 21,
-        .y = 3,
-        .width = 8,
-        .height = 2,
-        .pal_id = 15,
-        .charbase = 20,
     },
     {
         //pkmn name 
