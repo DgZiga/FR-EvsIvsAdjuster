@@ -14,9 +14,9 @@ struct BgConfig new_menu_bg_config[4] = {
     {.padding=0, .b_padding=0, .priority=3, .palette=0, .size=0, .map_base=30, .character_base=3, .bgid=3, } };
 struct TextboxTemplate txtboxes[];
 const u16 text_pal[] = {
-	rgb5(255, 0, 255), rgb5(248, 248, 248), rgb5(120, 120, 120),
-	rgb5(0, 0, 0), rgb5(208, 208, 208), rgb5(76, 154, 38),
-	rgb5(102, 194, 66), rgb5(168, 75, 76), rgb5(224, 114, 75),
+	rgb5(255, 0, 255), rgb5(248, 248, 248), rgb5(66, 66, 66),
+	rgb5(222, 222, 198), rgb5(208, 208, 208), rgb5(76, 154, 38),
+	rgb5(206, 66, 0), rgb5(168, 75, 76), rgb5(224, 114, 75),
 	rgb5(180, 124, 41), rgb5(241, 188, 60), rgb5(255, 0, 255),
     rgb5(255, 0, 255), rgb5(255, 0, 255), rgb5(255, 133, 200), rgb5(64, 200, 248)};
 void do_nothing();
@@ -55,8 +55,8 @@ s16 evs_cursor_positions[6][2] = {
 };
 //first index is stat index, second index is 0=x, 1=y
 s16 confirm_cursor_positions[2][2] = {
-    {65 ,139},
-    {135,139},
+    {63 ,141},
+    {136,141},
 };
 
 void upd_cursor_pos(){
@@ -78,7 +78,7 @@ void display_instructions(){
 extern pchar confirm_str[]; //defined in main.s
 void display_confirm_str(){
     rboxid_clean (2, true);
-    rboxid_print (2, 3, 50, 3, &text_color, 0, confirm_str);
+    rboxid_print (2, 3, 58, 6, &text_color, 0, confirm_str);
 }
 //Total EVs of a pkmn cant be more than 510. Returns true if more EVs can be added, false otherwise
 bool check_total_ev(){
@@ -241,6 +241,8 @@ void on_load(){
     //init menu state
     init_evs_menu_state();
 
+    evs_menu_state->curr_selected_pkmn = var_8004;
+
     //Show rboxes
     u32 player_money = get_player_money();
     fmt_money(player_money, false);
@@ -260,13 +262,17 @@ void on_load(){
     memcpy(&(evs_menu_state->concat_str_buff[11]), evs_menu_state->str_buff, 10);
 
     rboxid_clean (0, true);
-    rboxid_print (0, 3, 1, 1, &text_color, 0, evs_menu_state->concat_str_buff);
+    rboxid_print (0, 3, 1, 2, &text_color, 0, evs_menu_state->concat_str_buff);
 
+    u8 *buffer = malloc(11);
+    memcpy(buffer, party_player[evs_menu_state->curr_selected_pkmn].base.nick, 10);
+    buffer[11] = 0xFF;
     //pkmn name pkmn_name_buffer
     rboxid_clean (1, true);
-    rboxid_print (1, 3, 1, 1, &text_color, 0, party_player[evs_menu_state->curr_selected_pkmn].base.nick);
+    rboxid_print (1, 3, 3, 0, &text_color, 0, buffer);
     rboxid_update(1, 3);
     rboxid_tilemap_update(1);
+    free(buffer);
     //instructions
     display_instructions();
     
@@ -299,7 +305,7 @@ void on_load(){
     u32 species = pokemon_getattr(&party_player[evs_menu_state->curr_selected_pkmn], REQUEST_SPECIES, 0);
     struct SpriteTiles pkmn_sprite_tiles = pokemon_graphics_front[species];
     struct SpritePalette pkmn_sprite_pal = pokemon_palette_normal[species];
-    display_compressed_sprite_compressed_pal(64, 64, 45, 90, pkmn_sprite_tiles.tag, (void *)pkmn_sprite_tiles.data, pkmn_sprite_pal.tag, (void *)pkmn_sprite_pal.data, 0, 0);	
+    display_compressed_sprite_compressed_pal(64, 64, 49, 85, pkmn_sprite_tiles.tag, (void *)pkmn_sprite_tiles.data, pkmn_sprite_pal.tag, (void *)pkmn_sprite_pal.data, 0, 0);	
 
     //Load cursor sprite
     u8 cursor_oam_id = display_compressed_sprite(16, 16, evs_cursor_positions[0][0], evs_cursor_positions[0][1], CURSOR_TILES_TAG, (void *)CURSOR_TILE_ADDR, CURSOR_PALS_TAG, (void *)0x08463308, 1, 0);	
@@ -409,7 +415,7 @@ struct TextboxTemplate txtboxes[] = {
         //pkmn name 
         .bg_id = 0,
         .x = 2,
-        .y = 5,
+        .y = 4,
         .width = 9,
         .height = 2,
         .pal_id = 15,
@@ -418,7 +424,7 @@ struct TextboxTemplate txtboxes[] = {
     {
         //instructions 
         .bg_id = 0,
-        .x = 3,
+        .x = 1,
         .y = 16,
         .width = 28,
         .height = 4,

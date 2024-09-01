@@ -8,7 +8,6 @@ void main_entrypoint(){
 }
 
 int new_gui_main(const struct InterfaceDefinition* def) {
-    dprintf("interface_def_addr 0x%x\n, def 0x%x, \n", interface_def_addr, def);
     *interface_def_addr = def;
     fade_screen(0xFFFFFFFF, 0, 0, 16, 0x0000);
     void gui_handler(void);
