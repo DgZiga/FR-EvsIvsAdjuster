@@ -49,10 +49,10 @@ goto_r0:
 menu_text:
 .string 0x00,"Menu option\nDue",0xFF
 
-stat_names:
-.string " Hp\nAtk\nDef\nSp. Atk\nSp. Def\nSpeed",0xFF
-default_price:
-.string " 0",0xB7,0xFF
+instructions:
+.string " ",0x79,0x7A,": select stat     A: confirm",0xFE,0x7B,0x7C,": change EV      B: exit",0xFF
+confirm_str:
+.string " Confirm      Back",0xFF
 
 .thumb
 .align 2

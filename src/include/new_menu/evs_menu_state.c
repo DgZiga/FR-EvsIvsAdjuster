@@ -9,6 +9,7 @@ void init_evs_menu_state(){
     evs_menu_state->curr_price=0;
     evs_menu_state->curr_price_is_neg=false;
     memset(evs_menu_state->evs_bars_oam_ids,0,sizeof(evs_menu_state->evs_bars_oam_ids));
+    evs_menu_state->curr_mode = EVS;
 }
 
 #endif

@@ -45,7 +45,7 @@ const u8* bg0_get_bg_pal(){
     return __bg0Pal;
 }
 //first index is stat index, second index is 0=x, 1=y
-s16 cursor_positions[6][2] = {
+s16 evs_cursor_positions[6][2] = {
     {100,48 },
     {100,62 },
     {100,76 },
@@ -53,10 +53,36 @@ s16 cursor_positions[6][2] = {
     {100,104},
     {100,118},
 };
+//first index is stat index, second index is 0=x, 1=y
+s16 confirm_cursor_positions[2][2] = {
+    {65 ,139},
+    {135,139},
+};
 
 void upd_cursor_pos(){
-    objects[evs_menu_state->cursor_oam_id].pos1.x = cursor_positions[evs_menu_state->curr_stat_pos][0];
-    objects[evs_menu_state->cursor_oam_id].pos1.y = cursor_positions[evs_menu_state->curr_stat_pos][1];
+    if(evs_menu_state->curr_mode == EVS){
+        objects[evs_menu_state->cursor_oam_id].pos1.x = evs_cursor_positions[evs_menu_state->curr_stat_pos][0];
+        objects[evs_menu_state->cursor_oam_id].pos1.y = evs_cursor_positions[evs_menu_state->curr_stat_pos][1];
+    } else {
+        objects[evs_menu_state->cursor_oam_id].pos1.x = confirm_cursor_positions[evs_menu_state->curr_stat_pos][0];
+        objects[evs_menu_state->cursor_oam_id].pos1.y = confirm_cursor_positions[evs_menu_state->curr_stat_pos][1];
+    }
+}
+
+extern pchar instructions[]; //defined in main.s
+void display_instructions(){
+    rboxid_clean (3, true);
+    rboxid_print (3, 3, 1, 1, &text_color, 0, instructions);
+    rboxid_update(3, 3);
+    rboxid_tilemap_update(3);
+}
+
+extern pchar confirm_str[]; //defined in main.s
+void display_confirm_str(){
+    rboxid_clean (3, true);
+    rboxid_print (3, 3, 50, 3, &text_color, 0, confirm_str);
+    rboxid_update(3, 3);
+    rboxid_tilemap_update(3);
 }
 //Total EVs of a pkmn cant be more than 510. Returns true if more EVs can be added, false otherwise
 bool check_total_ev(){
@@ -67,6 +93,9 @@ bool check_total_ev(){
     return sum < 508;
 }
 void on_up(){
+    if(evs_menu_state->curr_mode != EVS){
+        return;
+    }
     if(evs_menu_state->curr_stat_pos != 0){
         evs_menu_state->curr_stat_pos--;
     }else{
@@ -75,7 +104,11 @@ void on_up(){
     upd_cursor_pos();
     audio_play(SOUND_GENERIC_CLINK);
 }
+
 void on_down(){
+    if(evs_menu_state->curr_mode != EVS){
+        return;
+    }
     if(evs_menu_state->curr_stat_pos != 5){
         evs_menu_state->curr_stat_pos++;
     }else{
@@ -87,57 +120,84 @@ void on_down(){
 
 
 void on_left(){
-    u32 curr_set_ev = evs_menu_state->curr_evs[evs_menu_state->curr_stat_pos];
-    if(curr_set_ev == 0){
-        audio_play(SOUND_CANT_OPEN_HELP_MENU);
-        return;
+    if(evs_menu_state->curr_mode == EVS){
+        u32 curr_set_ev = evs_menu_state->curr_evs[evs_menu_state->curr_stat_pos];
+        if(curr_set_ev == 0){
+            audio_play(SOUND_CANT_OPEN_HELP_MENU);
+            return;
+        }
+        evs_menu_state->curr_evs[evs_menu_state->curr_stat_pos]-=4;
+        objects[evs_menu_state->evs_bars_oam_ids[evs_menu_state->curr_stat_pos][0]].pos1.x--;
+        objects[evs_menu_state->evs_bars_oam_ids[evs_menu_state->curr_stat_pos][1]].pos1.x--;
+        audio_play(SOUND_GENERIC_CLINK);
+        calc_price(true);
+    } else {
+        if (evs_menu_state->curr_stat_pos == 0){
+            evs_menu_state->curr_stat_pos = 1;
+        } else {
+            evs_menu_state->curr_stat_pos = 0;
+        }
+        upd_cursor_pos();
+        audio_play(SOUND_GENERIC_CLINK);
     }
-    evs_menu_state->curr_evs[evs_menu_state->curr_stat_pos]-=4;
-    objects[evs_menu_state->evs_bars_oam_ids[evs_menu_state->curr_stat_pos][0]].pos1.x--;
-    objects[evs_menu_state->evs_bars_oam_ids[evs_menu_state->curr_stat_pos][1]].pos1.x--;
-    audio_play(SOUND_GENERIC_CLINK);
-    calc_price(true);
 }
 
 void on_right(){
-    u32 curr_set_ev = evs_menu_state->curr_evs[evs_menu_state->curr_stat_pos];
-    //if price is negative (the player has credit) money is always enough, otherwise project price and compare to player money
-    bool money_is_enough = evs_menu_state->curr_price_is_neg ? true : get_player_money() >= evs_menu_state->curr_price + PRICE_PER_4_EV; 
-    if(curr_set_ev >= 252 || !money_is_enough || !check_total_ev()){
-        audio_play(SOUND_CANT_OPEN_HELP_MENU);
-        return;
+    if(evs_menu_state->curr_mode == EVS){
+        u32 curr_set_ev = evs_menu_state->curr_evs[evs_menu_state->curr_stat_pos];
+        //if price is negative (the player has credit) money is always enough, otherwise project price and compare to player money
+        bool money_is_enough = evs_menu_state->curr_price_is_neg ? true : get_player_money() >= evs_menu_state->curr_price + PRICE_PER_4_EV; 
+        if(curr_set_ev >= 252 || !money_is_enough || !check_total_ev()){
+            audio_play(SOUND_CANT_OPEN_HELP_MENU);
+            return;
+        }
+        
+        evs_menu_state->curr_evs[evs_menu_state->curr_stat_pos]+=4;
+        objects[evs_menu_state->evs_bars_oam_ids[evs_menu_state->curr_stat_pos][0]].pos1.x++;
+        objects[evs_menu_state->evs_bars_oam_ids[evs_menu_state->curr_stat_pos][1]].pos1.x++;
+        audio_play(SOUND_GENERIC_CLINK);
+        calc_price(true);
+    } else {
+        if (evs_menu_state->curr_stat_pos == 0){
+            evs_menu_state->curr_stat_pos = 1;
+        } else {
+            evs_menu_state->curr_stat_pos = 0;
+        }
+        upd_cursor_pos();
+        audio_play(SOUND_GENERIC_CLINK);
     }
-    
-    evs_menu_state->curr_evs[evs_menu_state->curr_stat_pos]+=4;
-    objects[evs_menu_state->evs_bars_oam_ids[evs_menu_state->curr_stat_pos][0]].pos1.x++;
-    objects[evs_menu_state->evs_bars_oam_ids[evs_menu_state->curr_stat_pos][1]].pos1.x++;
+}
+
+void back_from_confirm(){
     audio_play(SOUND_GENERIC_CLINK);
-    calc_price(true);
+    evs_menu_state->curr_mode = EVS;
+    evs_menu_state->curr_stat_pos = 0;
+    upd_cursor_pos();
+    display_instructions();
 }
 
 void on_a(){
-    //calc price. Do not allow the player to leave with negative price.
-    u32 player_money = get_player_money();
-    if(evs_menu_state->curr_price_is_neg || evs_menu_state->curr_price > player_money){
-        audio_play(SOUND_CANT_OPEN_HELP_MENU);
-        return;
-    }
-
-    if(evs_menu_state->curr_price_is_neg){
-        player_money += evs_menu_state->curr_price;
+    if(evs_menu_state->curr_mode == CONFIRM){
+        if(evs_menu_state->curr_stat_pos == 0){
+            exit();
+        } else {
+            back_from_confirm();
+        }
     } else {
-        player_money -= evs_menu_state->curr_price;
+        audio_play(SOUND_GENERIC_CLINK);
+        evs_menu_state->curr_mode = CONFIRM;
+        evs_menu_state->curr_stat_pos = 0;
+        display_confirm_str();
+        upd_cursor_pos();
     }
-    set_player_money(player_money);
+}
 
-    audio_play(SOUND_GENERIC_CLINK);
-    pokemon_setattr(&party_player[evs_menu_state->curr_selected_pkmn], REQUEST_HP_EV   , &evs_menu_state->curr_evs [0]);
-    pokemon_setattr(&party_player[evs_menu_state->curr_selected_pkmn], REQUEST_ATK_EV  , &evs_menu_state->curr_evs [1]);
-    pokemon_setattr(&party_player[evs_menu_state->curr_selected_pkmn], REQUEST_DEF_EV  , &evs_menu_state->curr_evs [2]);
-    pokemon_setattr(&party_player[evs_menu_state->curr_selected_pkmn], REQUEST_SPATK_EV, &evs_menu_state->curr_evs [3]);
-    pokemon_setattr(&party_player[evs_menu_state->curr_selected_pkmn], REQUEST_SPDEF_EV, &evs_menu_state->curr_evs [4]);
-    pokemon_setattr(&party_player[evs_menu_state->curr_selected_pkmn], REQUEST_SPD_EV  , &evs_menu_state->curr_evs [5]);
-    exit();
+void on_b(){
+    if(evs_menu_state->curr_mode == CONFIRM){
+        back_from_confirm();
+    } else {
+        exit();
+    }
 }
 
 
@@ -146,6 +206,9 @@ void on_a(){
 
 
 void on_l(){
+    if(evs_menu_state->curr_mode != EVS){
+        return;
+    }
     evs_menu_state->curr_evs[evs_menu_state->curr_stat_pos] = 0;
     objects[evs_menu_state->evs_bars_oam_ids[evs_menu_state->curr_stat_pos][0]].pos1.x = BASE_1_X;
     objects[evs_menu_state->evs_bars_oam_ids[evs_menu_state->curr_stat_pos][1]].pos1.x = BASE_2_X;
@@ -154,6 +217,9 @@ void on_l(){
 }
 
 void on_r(){
+    if(evs_menu_state->curr_mode != EVS){
+        return;
+    }
     for(u8 i=0; i<63; i++){
         //if price is negative (the player has credit) money is always enough, otherwise project price and compare to player money
         bool money_is_enough = evs_menu_state->curr_price_is_neg ? true : get_player_money() >= evs_menu_state->curr_price + PRICE_PER_4_EV; 
@@ -170,7 +236,6 @@ void on_r(){
     calc_price(true);
 }
 
-extern pchar instructions[]; //defined in main.s
 void on_load(){
     //init menu state
     init_evs_menu_state();
@@ -193,6 +258,8 @@ void on_load(){
     rboxid_print (2, 3, 1, 1, &text_color, 0, party_player[evs_menu_state->curr_selected_pkmn].base.nick);
     rboxid_update(2, 3);
     rboxid_tilemap_update(2);
+    //instructions
+    display_instructions();
     
     u32 hp_ev    = pokemon_getattr(&party_player[evs_menu_state->curr_selected_pkmn], REQUEST_HP_EV   , 0) >> 2 << 2;
     u32 atk_ev   = pokemon_getattr(&party_player[evs_menu_state->curr_selected_pkmn], REQUEST_ATK_EV  , 0) >> 2 << 2;
@@ -226,7 +293,7 @@ void on_load(){
     display_compressed_sprite_compressed_pal(64, 64, 45, 90, pkmn_sprite_tiles.tag, (void *)pkmn_sprite_tiles.data, pkmn_sprite_pal.tag, (void *)pkmn_sprite_pal.data, 0, 0);	
 
     //Load cursor sprite
-    u8 cursor_oam_id = display_compressed_sprite(16, 16, cursor_positions[0][0], cursor_positions[0][1], CURSOR_TILES_TAG, (void *)CURSOR_TILE_ADDR, CURSOR_PALS_TAG, (void *)0x08463308, 1, 0);	
+    u8 cursor_oam_id = display_compressed_sprite(16, 16, evs_cursor_positions[0][0], evs_cursor_positions[0][1], CURSOR_TILES_TAG, (void *)CURSOR_TILE_ADDR, CURSOR_PALS_TAG, (void *)0x08463308, 1, 0);	
     evs_menu_state->cursor_oam_id = cursor_oam_id;
     upd_cursor_pos();
 
@@ -263,7 +330,7 @@ const struct InterfaceDefinition NEW_MENU_DEFINITION = {
     .textboxes     =txtboxes,
     .on_load       =on_load,
     .on_key_a=     on_a,
-    .on_key_b=     exit,
+    .on_key_b=     on_b,
     .on_key_start= do_nothing,
     .on_key_select=on_a,
     .on_key_l=     on_l,
@@ -289,7 +356,28 @@ void do_nothing(){
     return;
 }
 
-void exit(){
+void exit(){            
+    //calc price. Do not allow the player to leave with negative price.
+    u32 player_money = get_player_money();
+    if(evs_menu_state->curr_price_is_neg || evs_menu_state->curr_price > player_money){
+        audio_play(SOUND_CANT_OPEN_HELP_MENU);
+        return;
+    }
+
+    if(evs_menu_state->curr_price_is_neg){
+        player_money += evs_menu_state->curr_price;
+    } else {
+        player_money -= evs_menu_state->curr_price;
+    }
+    set_player_money(player_money);
+
+    audio_play(SOUND_GENERIC_CLINK);
+    pokemon_setattr(&party_player[evs_menu_state->curr_selected_pkmn], REQUEST_HP_EV   , &evs_menu_state->curr_evs [0]);
+    pokemon_setattr(&party_player[evs_menu_state->curr_selected_pkmn], REQUEST_ATK_EV  , &evs_menu_state->curr_evs [1]);
+    pokemon_setattr(&party_player[evs_menu_state->curr_selected_pkmn], REQUEST_DEF_EV  , &evs_menu_state->curr_evs [2]);
+    pokemon_setattr(&party_player[evs_menu_state->curr_selected_pkmn], REQUEST_SPATK_EV, &evs_menu_state->curr_evs [3]);
+    pokemon_setattr(&party_player[evs_menu_state->curr_selected_pkmn], REQUEST_SPDEF_EV, &evs_menu_state->curr_evs [4]);
+    pokemon_setattr(&party_player[evs_menu_state->curr_selected_pkmn], REQUEST_SPD_EV  , &evs_menu_state->curr_evs [5]);
     audio_play(SOUND_GENERIC_CLINK);
     super.multi_purpose_state_tracker=0;
     set_callback1(gui_exit);
@@ -318,7 +406,7 @@ struct TextboxTemplate txtboxes[] = {
         .width = 8,
         .height = 2,
         .pal_id = 15,
-        .charbase = 141,
+        .charbase = 20,
     },
     {
         //pkmn name 
@@ -328,7 +416,17 @@ struct TextboxTemplate txtboxes[] = {
         .width = 9,
         .height = 2,
         .pal_id = 15,
-        .charbase = 211,
+        .charbase = 40,
+    },
+    {
+        //instructions 
+        .bg_id = 0,
+        .x = 3,
+        .y = 16,
+        .width = 28,
+        .height = 4,
+        .pal_id = 15,
+        .charbase = 70,
     },
     {
         .bg_id = 0xFF, // marks the end of the tb array 
