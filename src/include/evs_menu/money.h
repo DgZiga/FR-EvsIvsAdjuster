@@ -3,7 +3,7 @@
 
 #include <pokeagb/pokeagb.h>
 #include "evs_menu_state.h"
-#include "new_menu.h"
+#include "evs_menu.h"
 
 #define PRICE_PER_4_EV 300
 

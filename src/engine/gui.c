@@ -36,7 +36,7 @@ void gui_exit() {
         case 1:
             m4aMPlayVolumeControl(&mplay_BGM, 0xFFFF, 256);
             set_callback1(c1_overworld);
-            set_callback2(c2_overworld_switch_start_menu);
+            set_callback2(c2_return_overworld_music_scripts_cont);
 			super.multi_purpose_state_tracker++;
             break;
 		case 2:

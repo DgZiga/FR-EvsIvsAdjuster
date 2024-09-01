@@ -2,7 +2,7 @@
 #define CONFIG_H
 
 #define EVS_MENU_STATE_START (&(party_opponent[0]).base.otname); //By default this is the opponent's party
-#include "include/new_menu/new_menu.h"
+#include "include/evs_menu/evs_menu.h"
 
 #define OAM_TABLE_START 0x83A3BB0 		//Default BPRE
 #define OAM_TABLE_SIZE 0x99 			//Default BPRE
@@ -14,10 +14,5 @@ const struct InterfaceDefinition* const IMPLEMENTED_INTERFACES[] = {&NEW_MENU_DE
 #define TOOL_COUNT sizeof(IMPLEMENTED_INTERFACES)/sizeof(IMPLEMENTED_INTERFACES[0])
 
 #include "engine/engine_main.h"
-
-BY_ITEM(0);
-BY_ITEM(1);
-
-
 
 #endif

@@ -15,6 +15,8 @@ extern const struct InterfaceDefinition NEW_MENU_DEFINITION;
 #include "evs_menu_state.h"
 
 struct TextColor text_color = {.background=0, .foreground=2, .shadow=3};
+void evs_ivs_menu_entrypoint();
+
 
 #include "money.h"
 

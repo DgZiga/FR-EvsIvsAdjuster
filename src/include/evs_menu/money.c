@@ -61,8 +61,6 @@ void calc_price(bool gfx_upd){
         evs_menu_state->concat_str_buff[10] = 0xFE; // \n
         memcpy(&(evs_menu_state->concat_str_buff[11]), evs_menu_state->str_buff, 10);
 
-        dprintf("money: %x, price: %x, concat: %x \n", evs_menu_state->player_money_str_buff, evs_menu_state->str_buff, evs_menu_state->concat_str_buff);
-
         rboxid_clean (0, true);
         rboxid_print (0, 3, 1, 2, &text_color, 0, evs_menu_state->concat_str_buff);
     }

@@ -1,12 +1,14 @@
 #ifndef NEW_MENU_C
 #define NEW_MENU_C
-#include "new_menu.h"
+#include "evs_menu.h"
 
 //char_base is multiplied by 0x4000 and added to 0x06000000. 
 //map_base is multiplied by 0x800 and added to 0x06000000.
 //size: 0 is 256x256, 1 is 512x256
 //priority: 0-3, 0 is higher
 //palette: 0 (16) or 1(256)
+void evs_ivs_menu_entrypoint(){ new_gui_main(IMPLEMENTED_INTERFACES[0]);}
+
 struct BgConfig new_menu_bg_config[4] = {
     {.padding=0, .b_padding=0, .priority=0, .palette=0, .size=0, .map_base=6 , .character_base=0, .bgid=0, }, 
     {.padding=0, .b_padding=0, .priority=1, .palette=0, .size=0, .map_base=14, .character_base=1, .bgid=1, }, 
