@@ -95,7 +95,7 @@ void gui_handler(){
 			gpu_sync_bg_show(3);
             super.multi_purpose_state_tracker++;
 			break;
-		case 5: //Input control NOTE: L and R ARE INVERTED IN POKEAGB
+		case 5: //Input control
 			if (!pal_fade_control.active) { //Wait for fadescreen to end
                 switch (super.buttons_new_and_repeated) { 
 					case KEY_SELECT:
@@ -109,6 +109,9 @@ void gui_handler(){
                         break;
                     case KEY_B:
 						def.on_key_b();
+                        return;
+                    case KEY_A:
+						def.on_key_a();
                         return;
                     case KEY_DOWN:
 						def.on_key_down();
