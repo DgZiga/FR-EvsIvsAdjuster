@@ -374,9 +374,9 @@ void do_nothing(){
 }
 
 void exit(){            
-    //calc price. Do not allow the player to leave with negative price.
+    //calc price. If price is negative give player the difference in money
     u32 player_money = get_player_money();
-    if(evs_menu_state->curr_price_is_neg || evs_menu_state->curr_price > player_money){
+    if(!evs_menu_state->curr_price_is_neg && evs_menu_state->curr_price > player_money){ //if price is positive and is higher than player money, don't allow exit
         audio_play(SOUND_CANT_OPEN_HELP_MENU);
         return;
     }

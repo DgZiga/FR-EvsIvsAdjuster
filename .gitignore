@@ -10,4 +10,5 @@ build/*
 *.id0
 *.id1
 *.json
-
+*.toml
+*.rar
